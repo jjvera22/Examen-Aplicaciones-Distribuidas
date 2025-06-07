@@ -2,6 +2,7 @@ package gimnasioapp.vistas.componentes;
 
 import gimnasioapp.controladores.ControladorMembresia;
 import gimnasioapp.modelos.Cliente;
+import gimnasioapp.modelos.Membresia;
 import gimnasioapp.modelos.Plan;
 
 import javax.swing.*;
@@ -13,7 +14,7 @@ import java.util.List;
 public class PanelFormulario extends JPanel {
 
     private JComboBox<Cliente> comboClientes;
-    private JComboBox<String> comboPlanes;
+    private JComboBox<Plan> comboPlanes;
     private JTextField txtFechaInicio;
     private JTextField txtFechaFin;
     private JComboBox<String> comboEstadoPago;
@@ -42,17 +43,6 @@ public class PanelFormulario extends JPanel {
         comboClientes = new JComboBox<>();
         comboClientes.setFont(fuente);
         add(comboClientes, gbc);
-
-        // 👉 Escuchar cambio de cliente y mostrar su plan
-        comboClientes.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Cliente clienteSeleccionado = (Cliente) comboClientes.getSelectedItem();
-                if (clienteSeleccionado != null) {
-                    controlador.cargarPlanPorCliente(clienteSeleccionado.getId());
-                }
-            }
-        });
 
         // Fila 2 - Plan
         gbc.gridx = 0;
@@ -129,18 +119,7 @@ public class PanelFormulario extends JPanel {
     public void cargarPlanes(List<Plan> planes) {
         comboPlanes.removeAllItems();
         for (Plan p : planes) {
-            comboPlanes.addItem(p.getNombre());
-        }
-    }
-
-    // ✅ Método para seleccionar el plan automáticamente
-    public void setPlanSeleccionado(String nombrePlan) {
-        if (nombrePlan == null) return;
-        for (int i = 0; i < comboPlanes.getItemCount(); i++) {
-            if (comboPlanes.getItemAt(i).equalsIgnoreCase(nombrePlan)) {
-                comboPlanes.setSelectedIndex(i);
-                break;
-            }
+            comboPlanes.addItem(p);
         }
     }
 
@@ -149,7 +128,7 @@ public class PanelFormulario extends JPanel {
         return comboClientes;
     }
 
-    public JComboBox<String> getComboPlanes() {
+    public JComboBox<Plan> getComboPlanes() {
         return comboPlanes;
     }
 
@@ -181,7 +160,32 @@ public class PanelFormulario extends JPanel {
         comboEstadoPago.setSelectedIndex(0);
     }
 	
+    public void cargarMembresiaFormulario(Membresia membresia) {
+        seleccionarClientePorId(membresia.getIdCliente(), comboClientes);
+        seleccionarPlanPorId(membresia.getIdPlan(), comboPlanes);
+        txtFechaInicio.setText(membresia.getFechaInicio());
+        txtFechaFin.setText(String.valueOf(membresia.getFechaFin()));
+        comboEstadoPago.setSelectedItem(membresia.getEstadoPago());
+    }
 
+    public void seleccionarClientePorId(int id, JComboBox<Cliente> combo) {
+        for (int i = 0; i < combo.getItemCount(); i++) {
+            Cliente c = combo.getItemAt(i);
+            if (c.getId() == id) {
+                combo.setSelectedIndex(i);
+                return;
+            }
+        }
+    }
 
+    public void seleccionarPlanPorId(int id, JComboBox<Plan> combo) {
+        for (int i = 0; i < combo.getItemCount(); i++) {
+            Plan p = combo.getItemAt(i);
+            if (p.getId() == id) {
+                combo.setSelectedIndex(i);
+                return;
+            }
+        }
+    }
 }
 

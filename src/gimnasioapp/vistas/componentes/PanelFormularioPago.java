@@ -3,6 +3,7 @@ package gimnasioapp.vistas.componentes;
 import gimnasioapp.controladores.ControladorPago;
 import gimnasioapp.gimnasioDAL.PlanDAL;
 import gimnasioapp.modelos.Cliente;
+import gimnasioapp.modelos.ComboItem;
 import gimnasioapp.modelos.Pago;
 import gimnasioapp.modelos.Membresia;
 import gimnasioapp.modelos.Plan;
@@ -15,7 +16,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class PanelFormularioPago extends JPanel {
-    private JComboBox<String> comboMembresias;
+    private JComboBox<ComboItem> comboMembresias;
     private JTextField txtFechaPago;
     private JTextField txtMonto;
     private JTextField txtMetodoPago;
@@ -113,7 +114,7 @@ public class PanelFormularioPago extends JPanel {
 
     private void guardarPago() {
         try {
-            String seleccion = (String) comboMembresias.getSelectedItem();
+            ComboItem seleccion = (ComboItem) comboMembresias.getSelectedItem();
             String fecha = txtFechaPago.getText().trim();
             String montoTexto = txtMonto.getText().trim();
             String metodoPago = txtMetodoPago.getText().trim();
@@ -126,13 +127,7 @@ public class PanelFormularioPago extends JPanel {
 
             double monto = Double.parseDouble(montoTexto);
 
-            String[] partes = seleccion.split(" - ");
-            if (partes.length < 1) {
-                mostrarMensaje("Formato de membresía inválido.");
-                return;
-            }
-
-            int membresiaId = Integer.parseInt(partes[0].trim());
+            int membresiaId = seleccion.getId();
 
             Membresia membresia = new Membresia();
             membresia.setId(membresiaId);
@@ -187,9 +182,11 @@ public class PanelFormularioPago extends JPanel {
     }
 
     public void setDatosPago(Pago pago) {
-        comboMembresias.setSelectedItem(pago.getMembresia().getTipo());
+        seleccionarMembresiaPorId(pago.getIdMembresia());
         txtFechaPago.setText(pago.getFechaPago());
         txtMonto.setText(String.valueOf(pago.getMonto()));
+        txtMetodoPago.setText(String.valueOf(pago.getMetodoPago()));
+        txtObservaciones.setText(String.valueOf(pago.getObservaciones()));
     }
 
     public JTextField getTxtFechaPago() {
@@ -208,15 +205,47 @@ public class PanelFormularioPago extends JPanel {
         return btnLimpiar;
     }
     
-    public void cargarMembresias(List<String> membresias) {
+    public void cargarMembresias(List<ComboItem> membresias) {
         comboMembresias.removeAllItems();
-        for (String membresia : membresias) {
+        for (ComboItem membresia : membresias) {
             comboMembresias.addItem(membresia);
         }
     }
     
-    public JComboBox<String> getComboMembresias() {
+    public JComboBox<ComboItem> getComboMembresias() {
         return comboMembresias;
     }
 
+    public void seleccionarMembresiaPorId(int id) {
+        for (int i = 0; i < comboMembresias.getItemCount(); i++) {
+            ComboItem item = comboMembresias.getItemAt(i);
+            if (item.getId() == id) {
+                comboMembresias.setSelectedItem(item);
+                return;
+            }
+        }
+    }
+    
+    public Pago obtenerPagoFormulario() {
+        Pago p = new Pago();
+        p.setFechaPago(txtFechaPago.getText());
+
+        try {
+            p.setMonto(Double.parseDouble(txtMonto.getText()));
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "⚠️ El monto ingresado no es válido.");
+            p.setMonto(0);
+        }
+
+        p.setMetodoPago(txtMetodoPago.getText());
+        p.setObservaciones(txtObservaciones.getText());
+
+        ComboItem seleccion = (ComboItem) comboMembresias.getSelectedItem();
+        System.out.println(seleccion.getId());
+        if (seleccion != null) {
+            p.setIdMembresia(seleccion.getId());
+        }
+
+        return p;
+    }
 }

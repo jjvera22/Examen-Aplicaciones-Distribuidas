@@ -7,6 +7,7 @@ import gimnasioapp.vistas.componentes.PanelTablaPlan;
 
 import java.sql.Connection;
 import java.util.List;
+import javax.swing.JOptionPane;
 
 public class ControladorPlan {
 
@@ -45,7 +46,7 @@ public class ControladorPlan {
         }
     }
 
-    public void editarPlan(Plan plan) {
+    public void cargarPlanEnFormulario(Plan plan) {
         panelFormulario.cargarPlanFormulario(plan);
     }
 
@@ -66,7 +67,26 @@ public class ControladorPlan {
     }
 
     public void cargarPlanes() {
-		actualizarTabla();
-	}
+        actualizarTabla();
+    }
+    
+    public void actualizarPlan(Plan plan) {
+        if (plan.getId() == 0) {
+            return;
+        }
+
+        Plan planForm = panelFormulario.obtenerPlanFormulario();
+        plan.setNombre(planForm.getNombre());
+        plan.setPrecio(planForm.getPrecio());
+        plan.setDuracionDias(planForm.getDuracionDias());
+        
+        if (planDAL.actualizar(plan)) {
+            JOptionPane.showMessageDialog(null, "✅ Cliente actualizado correctamente.");
+            actualizarTabla();
+            panelFormulario.limpiarFormulario();
+        } else {
+            JOptionPane.showMessageDialog(null, "❌ Error al actualizar el cliente.");
+        }
+    }
 
 }

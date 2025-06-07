@@ -38,7 +38,19 @@ public class PanelTablaPlan extends JPanel {
             int fila = tabla.getSelectedRow();
             if (fila != -1) {
                 Plan p = obtenerPlanDeFila(fila);
-                controlador.editarPlan(p);
+                controlador.actualizarPlan(p);
+            }
+        });
+        
+        tabla.getSelectionModel().addListSelectionListener(event -> {
+            if (!event.getValueIsAdjusting()) {
+                int fila = tabla.getSelectedRow();
+                if (fila >= 0) {
+                    Plan p = obtenerPlanDeFila(fila);
+                    if (p != null) {
+                        controlador.cargarPlanEnFormulario(p);
+                    }
+                }
             }
         });
 

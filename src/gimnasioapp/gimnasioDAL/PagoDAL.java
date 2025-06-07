@@ -163,4 +163,18 @@ public class PagoDAL {
 
         return filas;
     }
+    
+    public int obtenerIdMembresiaPorPagoId(int pagoId) {
+        String sql = "SELECT id_membresia FROM pagos WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, pagoId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("id_membresia");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al obtener id_membresia: " + e.getMessage());
+        }
+        return -1; // o lanzar excepción si prefieres manejarlo así
+    }
 }

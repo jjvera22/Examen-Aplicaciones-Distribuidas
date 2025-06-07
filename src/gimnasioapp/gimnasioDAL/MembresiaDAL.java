@@ -1,5 +1,6 @@
 package gimnasioapp.gimnasioDAL;
 
+import gimnasioapp.modelos.ComboItem;
 import gimnasioapp.modelos.Membresia;
 import gimnasioapp.modelos.Plan;
 import java.sql.*;
@@ -98,58 +99,29 @@ public class MembresiaDAL {
         return null;
     }
 	
-	public List<Object[]> obtenerMembresiasConNombres() {
-    List<Object[]> lista = new ArrayList<>();
-    String sql = "SELECT m.id, c.nombre AS cliente, p.nombre AS plan, m.fecha_inicio, m.fecha_fin, m.estado_pago " +
-                 "FROM membresias m " +
-                 "JOIN clientes c ON m.id_cliente = c.id " +
-                 "JOIN planes p ON m.id_plan = p.id";
-    try (Statement stmt = conn.createStatement();
-         ResultSet rs = stmt.executeQuery(sql)) {
-        while (rs.next()) {
-            Object[] fila = new Object[]{
-                rs.getInt("id"),
-                rs.getString("cliente"),
-                rs.getString("plan"),
-                rs.getString("fecha_inicio"),
-                rs.getString("fecha_fin"),
-                rs.getString("estado_pago")
-            };
-            lista.add(fila);
-        }
-    } catch (SQLException e) {
-        System.err.println("Error obteniendo membresías con nombres: " + e.getMessage());
-    }
-    return lista;
-}
-
-	
-    // Método corregido con nombre esperado por el controlador
-    public Plan obtenerPlanActualPorCliente(int idCliente) {
-        Plan plan = null;
-        String sql = "SELECT p.id, p.nombre, p.precio, p.duracion_dias " +
+    public List<Object[]> obtenerMembresiasConNombres() {
+        List<Object[]> lista = new ArrayList<>();
+        String sql = "SELECT m.id, c.nombre AS cliente, p.nombre AS plan, m.fecha_inicio, m.fecha_fin, m.estado_pago " +
                      "FROM membresias m " +
-                     "JOIN planes p ON m.id_plan = p.id " +
-                     "WHERE m.id_cliente = ? " +
-                     "ORDER BY m.fecha_inicio DESC LIMIT 1";
-
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, idCliente);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    plan = new Plan(
-                        rs.getInt("id"),
-                        rs.getString("nombre"),
-                        rs.getDouble("precio"),
-                        rs.getInt("duracion_dias")
-                    );
-                }
+                     "JOIN clientes c ON m.id_cliente = c.id " +
+                     "JOIN planes p ON m.id_plan = p.id";
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                Object[] fila = new Object[]{
+                    rs.getInt("id"),
+                    rs.getString("cliente"),
+                    rs.getString("plan"),
+                    rs.getString("fecha_inicio"),
+                    rs.getString("fecha_fin"),
+                    rs.getString("estado_pago")
+                };
+                lista.add(fila);
             }
         } catch (SQLException e) {
-            System.err.println("Error obteniendo plan actual del cliente: " + e.getMessage());
+            System.err.println("Error obteniendo membresías con nombres: " + e.getMessage());
         }
-
-        return plan;
+        return lista;
     }
 
     // Métodos no implementados aún
@@ -197,22 +169,23 @@ public class MembresiaDAL {
 		}
     }
     
-    public List<String> obtenerMembresiaDataComboBox() {
-        List<String> lista = new ArrayList<>();
+    public List<ComboItem> obtenerMembresiaDataComboBox() {
+        List<ComboItem> lista = new ArrayList<>();
         String sql = "SELECT m.id, c.nombre AS nombre_cliente, p.nombre AS nombre_plan " +
-                    "FROM membresias m " +
-                    "JOIN clientes c ON m.id_cliente = c.id " +
-                    "JOIN planes p ON m.id_plan = p.id";
+                     "FROM membresias m " +
+                     "JOIN clientes c ON m.id_cliente = c.id " +
+                     "JOIN planes p ON m.id_plan = p.id";
 
         try (Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(sql)) {
+             ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
                 int id = rs.getInt("id");
                 String cliente = rs.getString("nombre_cliente");
                 String plan = rs.getString("nombre_plan");
 
-                lista.add(id + " - " + cliente + " - " + plan);
+                String textoVisible = cliente + " - " + plan;
+                lista.add(new ComboItem(id, textoVisible));
             }
 
         } catch (SQLException e) {
@@ -221,5 +194,5 @@ public class MembresiaDAL {
 
         return lista;
     }
-
+    
 }

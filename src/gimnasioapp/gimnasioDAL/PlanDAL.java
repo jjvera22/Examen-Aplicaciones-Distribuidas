@@ -53,7 +53,7 @@ public class PlanDAL {
 
     public List<Plan> obtenerTodos() {
         List<Plan> lista = new ArrayList<>();
-        String sql = "SELECT * FROM planes ORDER BY nombre ASC";
+        String sql = "SELECT * FROM planes";
         try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 Plan p = new Plan();

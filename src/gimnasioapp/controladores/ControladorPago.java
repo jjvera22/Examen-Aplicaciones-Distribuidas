@@ -3,6 +3,7 @@ package gimnasioapp.controladores;
 import gimnasioapp.gimnasioDAL.MembresiaDAL;
 import gimnasioapp.gimnasioDAL.PagoDAL;
 import gimnasioapp.gimnasioDAL.PlanDAL;
+import gimnasioapp.modelos.ComboItem;
 import gimnasioapp.modelos.Pago;
 import gimnasioapp.modelos.Plan;
 import gimnasioapp.vistas.componentes.PanelFormularioPago;
@@ -11,6 +12,8 @@ import gimnasioapp.modelos.Membresia;
 import java.sql.Connection;
 
 import java.util.List;
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
 
 public class ControladorPago {
     private final PagoDAL pagoDAL;
@@ -32,6 +35,8 @@ public class ControladorPago {
     public void setPanelTabla(PanelTablaPago panelTabla) {
         this.panelTabla = panelTabla;
     }
+    
+    
 
     public void guardarPago(Pago pago) {
         try {
@@ -99,10 +104,51 @@ public class ControladorPago {
     
     public void obtenerMembresias() {
         MembresiaDAL membresiaDAL = new MembresiaDAL(conn);
-        List<String> membresias = membresiaDAL.obtenerMembresiaDataComboBox();
+        List<ComboItem> membresias = membresiaDAL.obtenerMembresiaDataComboBox();
         panelFormulario.cargarMembresias(membresias);
     }
 
+    public Pago obtenerPagoDesdeFila(JTable tabla) {
+        int fila = tabla.getSelectedRow();
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(null, "Seleccione una fila.");
+            return null;
+        }
+
+        Pago p = new Pago();
+        
+        int pagoId = (int) tabla.getValueAt(fila, 0);
+        int idMembresia = pagoDAL.obtenerIdMembresiaPorPagoId(pagoId);
+        
+        p.setId(pagoId);
+        if (idMembresia != -1) {
+            panelFormulario.seleccionarMembresiaPorId(idMembresia);
+        }
+        p.setFechaPago((String) tabla.getValueAt(fila, 2));
+        p.setMonto((Double) tabla.getValueAt(fila, 3));
+        p.setMetodoPago((String) tabla.getValueAt(fila, 4));
+        p.setObservaciones((String) tabla.getValueAt(fila, 5));
+        return p;
+    }
     
-   
+    public void actualizarPago(Pago pago) {
+        if (pago.getId() == 0) {
+            return;
+        }
+
+        Pago pagoForm = panelFormulario.obtenerPagoFormulario();
+        pago.setIdMembresia(pagoForm.getIdMembresia());
+        pago.setFechaPago(pagoForm.getFechaPago());
+        pago.setMonto(pagoForm.getMonto());
+        pago.setMetodoPago(pagoForm.getMetodoPago());
+        pago.setObservaciones(pagoForm.getObservaciones());
+        
+        if (pagoDAL.actualizar(pago)) {
+            JOptionPane.showMessageDialog(null, "✅ Cliente actualizado correctamente.");
+            actualizarTabla();
+            panelFormulario.limpiarCampos();
+        } else {
+            JOptionPane.showMessageDialog(null, "❌ Error al actualizar el cliente.");
+        }
+    }
 }

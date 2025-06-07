@@ -10,14 +10,44 @@ import java.util.List;
 public class PanelTablaPago extends JPanel {
     private JTable tablaPagos;
     private DefaultTableModel modelo;
+    private final JButton btnEditar = new JButton("✏️ Editar");
+    private final JButton btnEliminar = new JButton("🗑️ Eliminar");
+    private ControladorPago controlador;
 
     public PanelTablaPago(ControladorPago controlador) {
+        this.controlador = controlador;
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createTitledBorder("Pagos Registrados"));
 
         modelo = new DefaultTableModel(new Object[]{"ID", "Membresía", "Fecha", "Monto", "Método", "Observaciones"}, 0);
         tablaPagos = new JTable(modelo);
+        
+        JPanel panelBotones = new JPanel();
+        panelBotones.add(btnEditar);
+        panelBotones.add(btnEliminar);
+       
         add(new JScrollPane(tablaPagos), BorderLayout.CENTER);
+        add(panelBotones, BorderLayout.SOUTH);
+        
+        btnEditar.addActionListener(e -> {
+            Pago p = controlador.obtenerPagoDesdeFila(tablaPagos);
+            controlador.actualizarPago(p);
+        });
+        
+        tablaPagos.getSelectionModel().addListSelectionListener(event -> {
+            if (!event.getValueIsAdjusting()) {
+                
+                int fila = tablaPagos.getSelectedRow();
+              
+                if (fila >= 0) {
+                    Pago p = controlador.obtenerPagoDesdeFila(tablaPagos);
+                    if (p != null) {
+                        controlador.cargarPagoEnFormulario(p);
+                    }
+                }
+            }
+        });
+                
     }
 
     public void agregarPago(Pago pago) {

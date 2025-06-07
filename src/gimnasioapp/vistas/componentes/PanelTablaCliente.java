@@ -39,7 +39,17 @@ public class PanelTablaCliente extends JPanel {
         btnEditar.addActionListener(e -> {
             Cliente c = controlador.obtenerClienteDesdeFila(tabla);
             if (c != null) {
-                controlador.cargarClienteEnFormulario(c);
+                controlador.actualizarCliente(c);
+            }
+        });
+        
+        tabla.getSelectionModel().addListSelectionListener(event -> {
+            // Solo actuar cuando la selección haya finalizado
+            if (!event.getValueIsAdjusting()) {
+                Cliente c = controlador.obtenerClienteDesdeFila(tabla);
+                if (c != null) {
+                    controlador.cargarClienteEnFormulario(c);
+                }
             }
         });
 

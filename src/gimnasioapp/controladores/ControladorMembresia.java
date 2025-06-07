@@ -50,14 +50,6 @@ public class ControladorMembresia {
         panelFormulario.cargarPlanes(planes);
     }
 
-    public void cargarPlanPorCliente(int idCliente) {
-        MembresiaDAL membresiaDAL = new MembresiaDAL(conn);
-        Plan plan = membresiaDAL.obtenerPlanActualPorCliente(idCliente);
-        if (plan != null) {
-            panelFormulario.setPlanSeleccionado(plan.getNombre());
-        }
-    }
-
     // ✅ Nuevo método que usa la versión con nombres para cargar a la tabla
     public void cargarMembresias() {
         MembresiaDAL membresiaDAL = new MembresiaDAL(conn);
@@ -103,5 +95,45 @@ public class ControladorMembresia {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(null, "Error al guardar membresía: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
+    
+    public Membresia obtenerMembresiaDesdeFila(JTable tabla) {
+        int fila = tabla.getSelectedRow();
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(null, "Seleccione una fila.");
+            return null;
+        }
+        
+        MembresiaDAL membresiaDAL = new MembresiaDAL(conn);
+
+        int membresiaId = (int) tabla.getValueAt(fila, 0);
+        
+        Membresia membresia = membresiaDAL.obtenerPorId(membresiaId);
+
+        return membresia;
+    }
+    
+    public void seleccionarClientePorId(int id, JComboBox<Cliente> combo) {
+        for (int i = 0; i < combo.getItemCount(); i++) {
+            Cliente c = combo.getItemAt(i);
+            if (c.getId() == id) {
+                combo.setSelectedIndex(i);
+                return;
+            }
+        }
+    }
+
+    public void seleccionarPlanPorId(int id, JComboBox<Plan> combo) {
+        for (int i = 0; i < combo.getItemCount(); i++) {
+            Plan p = combo.getItemAt(i);
+            if (p.getId() == id) {
+                combo.setSelectedIndex(i);
+                return;
+            }
+        }
+    }
+    
+    public void cargarMembresiaEnFormulario(Membresia membresia) {
+        panelFormulario.cargarMembresiaFormulario(membresia);
     }
 }

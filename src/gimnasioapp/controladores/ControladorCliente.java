@@ -37,7 +37,7 @@ public class ControladorCliente {
             JOptionPane.showMessageDialog(null, "Formulario no disponible.");
         }
     }
-
+    
     public void guardarCliente(Cliente cliente) {
         if (clienteDAL.insertar(cliente)) {
             JOptionPane.showMessageDialog(null, "✅ Cliente guardado correctamente.");
@@ -54,6 +54,13 @@ public class ControladorCliente {
             return;
         }
 
+        Cliente clienteForm = panelFormulario.obtenerClienteFormulario();
+        cliente.setCedula(clienteForm.getCedula());
+        cliente.setCorreo(clienteForm.getCorreo());
+        cliente.setDireccion(clienteForm.getDireccion());
+        cliente.setNombre(clienteForm.getNombre());
+        cliente.setTelefono(clienteForm.getTelefono());
+        
         if (clienteDAL.actualizar(cliente)) {
             JOptionPane.showMessageDialog(null, "✅ Cliente actualizado correctamente.");
             actualizarTabla();
@@ -95,7 +102,6 @@ public class ControladorCliente {
     public Cliente obtenerClienteDesdeFila(JTable tabla) {
         int fila = tabla.getSelectedRow();
         if (fila == -1) {
-            JOptionPane.showMessageDialog(null, "Seleccione una fila.");
             return null;
         }
 

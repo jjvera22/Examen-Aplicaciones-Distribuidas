@@ -1,0 +1,5 @@
+/build
+/build/classes
+*.class
+build/classes/resources/db/GimnasioApp.s3db
+src/resources/db/GimnasioApp.s3db

@@ -1,6 +1,7 @@
 package gimnasioapp.vistas.componentes;
 
 import gimnasioapp.controladores.ControladorMembresia;
+import gimnasioapp.modelos.Membresia;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -50,6 +51,15 @@ public class PanelTabla extends JPanel {
         btnEditar = new JButton("Editar");
         btnEditar.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         btnEditar.setIcon(new ImageIcon("src/resources/iconos/editar.png"));
+        
+        tabla.getSelectionModel().addListSelectionListener(event -> {
+            if (!event.getValueIsAdjusting()) {
+                Membresia m = controlador.obtenerMembresiaDesdeFila(tabla);
+                if (m != null) {
+                    controlador.cargarMembresiaEnFormulario(m);
+                }
+            }
+        });
 
         btnEliminar = new JButton("Eliminar");
         btnEliminar.setFont(new Font("Segoe UI", Font.PLAIN, 14));
